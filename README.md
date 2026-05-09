@@ -2,13 +2,14 @@
   <h1>⚡ DevMatchs</h1>
 
   <p align="center">
-    <em>Connect. Collaborate. Build. — Where developers find their perfect team.</em>
+    <em>Tinder for Developers — Discover. Connect. Build Together.</em>
   </p>
 
   <p align="center">
     <img src="https://img.shields.io/github/last-commit/sayantangope/DevMatchs?style=default&logo=git&logoColor=white&color=6366f1" alt="last-commit">
-    <img src="https://img.shields.io/github/languages/top/sayantangope/DevMatchs?style=default&color=6366f1" alt="repo-top-language">
+    <img src="https://img.shields.io/github/languages/top/sayantangope/DevMatchs?style=default&color=6366f1&logo=javascript&logoColor=white" alt="repo-top-language">
     <img src="https://img.shields.io/badge/submodules-2-6366f1?style=default" alt="submodules">
+    <img src="https://img.shields.io/badge/deployed-AWS-FF9900?style=default&logo=amazonaws&logoColor=white" alt="deployed on aws">
   </p>
 
   <p align="center">
@@ -25,11 +26,9 @@
 - [📍 Overview](#-overview)
 - [👾 Features](#-features)
 - [🛠️ Languages & Technologies](#️-languages--technologies)
+- [🏗️ Architecture](#️-architecture)
 - [📁 Project Structure](#-project-structure)
 - [🚀 Getting Started](#-getting-started)
-  - [☑️ Prerequisites](#-prerequisites)
-  - [⚙️ Installation](#-installation)
-  - [🤖 Usage](#-usage)
 - [🔄 Working with Submodules](#-working-with-submodules)
 - [📌 Project Roadmap](#-project-roadmap)
 - [🔰 Contributing](#-contributing)
@@ -42,46 +41,60 @@
 
 ## 📍 Overview
 
-**DevMatchs** is the parent repository for the DevMatchs full-stack platform. It does not contain source code directly — instead, it links the **frontend** and **backend** as independent Git submodules, each with their own version control lifecycle.
+**DevMatchs** is a **Tinder-style matchmaking platform for developers** — swipe through profiles, send connection requests, and chat one-on-one with developers who match your vibe and stack. Unlock premium features via **Razorpay** payments, get notified via **AWS SES** emails, and enjoy a real-time experience powered by **Socket.IO**.
 
-This repository serves as a single entry point to:
-- Clone and set up the entire project in one command
-- Keep frontend and backend versions in sync
-- Simplify local development across both services
+This is the **parent repository** that links the frontend and backend as independent Git submodules. It serves as a single entry point to clone and understand the full project — setup instructions live in each submodule's own README.
 
 | Submodule | Repository | Description |
 |---|---|---|
-| `frontend/` | [DevMatchs-web](https://github.com/sayantangope/DevMatchs-web) | React-based web application |
-| `backend/` | [DevMatchs-server](https://github.com/sayantangope/DevMatchs-server) | Node.js / Express REST API |
+| `frontend/` | [DevMatchs-web](https://github.com/sayantangope/DevMatchs-web) | React 19 SPA — feed, chat, profile, premium |
+| `backend/` | [DevMatchs-server](https://github.com/sayantangope/DevMatchs-server) | Express v5 REST API + Socket.IO server |
 
 ---
 
 ## 👾 Features
 
-### 🤝 Developer Matching
-- **Swipe-style Connect** — Browse developer profiles and send connection requests, just like a dating app but for building teams and collaborations
-- **Smart Matching** — Get matched with developers based on tech stack, interests, and project goals
-- **Explore Feed** — Discover developers nearby or globally who are open to collaborating
+### 🃏 Developer Feed & Matching
+- Swipe-style developer feed — browse profiles and send **Interested** or **Ignored** requests
+- Each card shows name, photo, age, gender, skills, and bio
+- Feed automatically excludes already-connected or previously-interacted developers
 
 ### 📨 Connection Requests
-- **Send Requests** — Reach out to any developer with a connection request
-- **Review Requests** — Accept or decline incoming requests from your dashboard
-- **Pending Queue** — Track all sent and received requests in one place
+- Send connection requests with `interested` or `ignored` status to any developer in the feed
+- Review incoming requests — **accept** or **reject** with one click from your dashboard
+- Email notification fired via **AWS SES** on every new connection request received
+- Dedicated pending requests view to manage your queue
 
-### 💬 One-to-One Chat
-- **Real-time Messaging** — Instant chat powered by **Socket.io** once a connection is accepted
-- **Private Conversations** — Secure, direct messaging between matched developers only
-- **Live Status** — See when your connection is online or was last active
+### 💬 Real-time One-to-One Chat
+- Private chat rooms scoped per accepted connection pair
+- Messages delivered instantly via **Socket.IO** — no page refresh needed
+- Full chat history persisted in MongoDB and loaded when you open a conversation
+- Only mutually accepted connections can open a chat — no unsolicited messages
 
 ### 👤 Profile Management
-- **Rich Developer Profiles** — Showcase your skills, tech stack, GitHub, portfolio, and bio
-- **Update Anytime** — Edit your profile details, avatar, and availability status
-- **Role & Expertise Tags** — Label yourself as Frontend, Backend, Full Stack, ML Engineer, etc.
+- Rich developer profiles with name, age, gender, about, skills, and photo
+- Edit profile details anytime from a dedicated edit page
+- Skills rendered as tags for quick scanning by other developers
 
-### 🔐 Authentication & Access
-- **Secure Auth** — Protected routes with role-based access control
-- **Profile Completion Flow** — Guided onboarding for new users before accessing the platform
-- **Persistent Sessions** — Stay logged in across visits
+### 💳 Premium Membership (Razorpay)
+- **Silver** and **Gold** membership tiers
+- Secure order creation and checkout flow via **Razorpay**
+- Backend webhook verifies payment and upgrades `isPremium` + `membershipType` on the user
+- Premium unlocks additional platform features and visibility boosts
+
+### 🔐 Authentication & Sessions
+- JWT-based auth stored in HTTP-only cookies
+- Passwords hashed with **bcrypt**
+- Protected routes on both frontend and backend
+- Auto-logout on token expiry
+
+### 📧 Email Notifications (AWS SES)
+- Transactional emails sent via **AWS SES** (region: `ap-south-1`)
+- Triggered automatically on connection request events
+- Configured using `@aws-sdk/client-ses`
+
+### ⏰ Scheduled Jobs
+- Background **cron jobs** via `node-cron` for periodic cleanup and maintenance tasks
 
 ---
 
@@ -89,135 +102,121 @@ This repository serves as a single entry point to:
 
 ### 🌐 Frontend — [DevMatchs-web](https://github.com/sayantangope/DevMatchs-web)
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-764ABC?style=for-the-badge&logo=redux&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router_v7-CA4245?style=for-the-badge&logo=reactrouter&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![DaisyUI](https://img.shields.io/badge/DaisyUI-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
 
 ### ⚙️ Backend — [DevMatchs-server](https://github.com/sayantangope/DevMatchs-server)
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![Express v5](https://img.shields.io/badge/Express_v5-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Mongoose](https://img.shields.io/badge/Mongoose_v9-880000?style=for-the-badge&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=3395FF)
+![AWS SES](https://img.shields.io/badge/AWS_SES-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### ☁️ Infrastructure & Deployment
+
+![AWS](https://img.shields.io/badge/Deployed_on_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![MongoDB Atlas](https://img.shields.io/badge/MongoDB_Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+
+---
+
+## 🏗️ Architecture
+
+```
+                  ┌──────────────────────────────┐
+                  │         React 19 SPA          │
+                  │  Vite · Redux · DaisyUI · RRv7│
+                  └──────────────┬───────────────┘
+                                 │  REST API (Axios)
+                                 │  WebSocket (Socket.IO)
+                  ┌──────────────▼───────────────┐
+                  │       Express v5 Server        │
+                  │   JWT Auth · bcrypt · cron     │
+                  └──────┬──────────┬─────────────┘
+                         │          │
+            ┌────────────▼──┐  ┌────▼──────────────┐
+            │  MongoDB Atlas │  │     AWS SES        │
+            │  (Mongoose v9) │  │  Email Notifs      │
+            └───────────────┘  └───────────────────┘
+                         │
+            ┌────────────▼──────────────┐
+            │     Razorpay Gateway       │
+            │  Orders · Webhook · Premium│
+            └───────────────────────────┘
+```
 
 ---
 
 ## 📁 Project Structure
 
 ```
-DevMatchs/
-├── frontend/          →  DevMatchs-web  (React app)
-├── backend/           →  DevMatchs-server (Node/Express API)
+DevMatchs/                          ← Parent repo (this)
+├── frontend/                       → DevMatchs-web (React SPA)
+│   └── src/
+│       ├── components/             # Feed, Chat, Profile, Requests, Premium...
+│       ├── utils/
+│       │   ├── socket.js           # Socket.IO singleton client
+│       │   └── slices/             # Redux — userSlice, feedSlice, connectionSlice, requestSlice
+│       └── constants/constants.js  # BASE_URL config
+│
+├── backend/                        → DevMatchs-server (Express API)
+│   └── src/
+│       ├── models/                 # User, ConnectionRequest, Chat, Payment
+│       ├── routes/                 # auth, profile, request, user, chat, payment
+│       └── utils/                  # socket.js, sendEmail, razorpay, cronjob, validate
+│
 └── README.md
 ```
 
-> **Note:** Each subdirectory is a Git submodule pointing to a separate repository. Changes to frontend or backend must be committed inside their respective repos first, then updated here.
+> Each subdirectory is an independent Git submodule. For full source structure and setup steps, see each repo's own README.
 
 ---
 
 ## 🚀 Getting Started
 
-### ☑️ Prerequisites
-
-Ensure your environment meets the following requirements before cloning:
-
-- **Git**: v2.x or higher (with submodule support)
-- **Node.js**: v16.x or higher
-- **npm**: v8.x or higher
-
-### ⚙️ Installation
-
-#### 1. Clone with All Submodules
+Clone this repo with all submodules in one command:
 
 ```bash
 git clone --recurse-submodules https://github.com/sayantangope/DevMatchs.git
-cd DevMatchs
 ```
 
-If you already cloned without submodules, initialize them manually:
+For environment variables, full setup, and run instructions refer to each submodule:
 
-```bash
-git submodule update --init --recursive
-```
-
-#### 2. Backend Setup
-
-```bash
-cd backend
-npm install
-```
-
-Create a `.env` file in the `backend/` directory with the required environment variables. Refer to the [DevMatchs-server README](https://github.com/sayantangope/DevMatchs-server) for the full list.
-
-#### 3. Frontend Setup
-
-```bash
-cd ../frontend
-npm install
-```
-
-Create a `.env` file in the `frontend/` directory. Refer to the [DevMatchs-web README](https://github.com/sayantangope/DevMatchs-web) for the full list.
-
----
-
-### 🤖 Usage
-
-#### Run Backend
-
-```bash
-cd backend
-npm run dev
-# API server starts at http://localhost:8000
-```
-
-#### Run Frontend
-
-```bash
-cd frontend
-npm run dev
-# App runs at http://localhost:5173 (or as configured)
-```
-
-> Run both terminals simultaneously for full-stack local development.
+- ⚙️ **Backend setup** → [DevMatchs-server README](https://github.com/sayantangope/DevMatchs-server#readme)
+- 🌐 **Frontend setup** → [DevMatchs-web README](https://github.com/sayantangope/DevMatchs-web#readme)
 
 ---
 
 ## 🔄 Working with Submodules
 
-### Pull Latest Changes from Both Submodules
-
+**Pull latest from both submodules:**
 ```bash
 git submodule update --remote
 ```
 
-### After Updating Submodules, Sync in Parent Repo
-
+**Commit submodule pointer updates in parent:**
 ```bash
 git add .
 git commit -m "chore: update submodules to latest"
 git push
 ```
 
-### Make Changes to a Submodule
-
-Navigate into the submodule, make changes, then commit and push **inside that repo**:
-
+**Push changes made inside a submodule then sync parent:**
 ```bash
-cd frontend
-# make your changes
-git add .
-git commit -m "feat: your change"
+cd frontend        # or backend
+git add . && git commit -m "feat: your change"
 git push origin main
-```
-
-Then update the parent repo to track the new commit:
-
-```bash
 cd ..
 git add frontend
 git commit -m "chore: bump frontend submodule"
@@ -228,60 +227,58 @@ git push
 
 ## 📌 Project Roadmap
 
-- [x] **Parent repo with Git submodule setup**
-- [x] **Frontend submodule linked** (DevMatchs-web)
-- [x] **Backend submodule linked** (DevMatchs-server)
-- [ ] One-command startup script (`npm run dev` from root)
-- [ ] Docker Compose for full-stack containerized deployment
+### ✅ Completed
+- [x] JWT authentication with bcrypt
+- [x] Developer swipe feed with Interested / Ignored requests
+- [x] Accept / reject incoming connection requests
+- [x] Real-time one-to-one chat via Socket.IO
+- [x] Profile view and edit
+- [x] Razorpay premium membership (Silver & Gold)
+- [x] AWS SES email notifications on connection events
+- [x] Scheduled cron jobs for maintenance
+- [x] Deployed on AWS
+
+### 🔜 Upcoming
+- [ ] Profile photo upload via AWS S3
+- [ ] Swipe animations on developer cards
+- [ ] Push notifications
+- [ ] Admin dashboard
+- [ ] Docker Compose for one-command local setup
 - [ ] CI/CD pipeline with GitHub Actions
-- [ ] Monorepo migration (optional alternative to submodules)
 
 ---
 
 ## 🔰 Contributing
 
-Contributions are welcome! Since this is a submodule-based repository, please follow the correct workflow:
+Contributions are welcome! Please direct them to the correct submodule repo:
 
-1. **For frontend changes** → contribute to [DevMatchs-web](https://github.com/sayantangope/DevMatchs-web)
-2. **For backend changes** → contribute to [DevMatchs-server](https://github.com/sayantangope/DevMatchs-server)
-3. **For project-wide structure** → open an issue or PR here
+- **Frontend changes** → [DevMatchs-web](https://github.com/sayantangope/DevMatchs-web)
+- **Backend changes** → [DevMatchs-server](https://github.com/sayantangope/DevMatchs-server)
+- **Project-wide issues** → open an issue here
 
 <details>
-<summary>General Contribution Steps</summary>
+<summary>Contribution Steps</summary>
 
-1. Fork the relevant submodule repository.
-2. Clone your fork locally.
-3. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. Make and test your changes.
-5. Commit with a clear message:
-   ```bash
-   git commit -m "feat: describe your change"
-   ```
-6. Push and open a Pull Request against the original repo.
+1. Fork the relevant submodule repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'feat: add amazing feature'`
+4. Push and open a Pull Request against the original repo
 
 </details>
 
----
 
-## 🎗 License
 
-This project is licensed under the **MIT License**.
 
-You are free to use, modify, and distribute this project with attribution.
 
 ---
 
 ## 👨‍💻 Author
 
 **Sayantan Gope**
-
 - GitHub: [@sayantangope](https://github.com/sayantangope)
 
 <div align="center">
   <br>
   <p><strong>Made with ❤️ by Sayantan Gope</strong></p>
-  <p><em>Connect. Collaborate. Build. ⚡</em></p>
+  <p><em>Check it Out!!. ⚡</em></p>
 </div>
