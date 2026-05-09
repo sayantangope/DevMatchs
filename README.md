@@ -13,6 +13,10 @@
   </p>
 
   <p align="center">
+    🚀 <a href="https://devmatchs.store/" target="_blank"><strong>Live Demo — devmatchs.store</strong></a>
+  </p>
+
+  <p align="center">
     🌐 <a href="https://github.com/sayantangope/DevMatchs-web" target="_blank">Frontend Repo</a> &nbsp;|&nbsp;
     ⚙️ <a href="https://github.com/sayantangope/DevMatchs-server" target="_blank">Backend Repo</a>
   </p>
@@ -266,9 +270,11 @@ Contributions are welcome! Please direct them to the correct submodule repo:
 
 </details>
 
+---
 
+## 🎗 License
 
-
+Backend is licensed under the **ISC License**. Frontend is currently unlicensed / private.
 
 ---
 
@@ -280,5 +286,5 @@ Contributions are welcome! Please direct them to the correct submodule repo:
 <div align="center">
   <br>
   <p><strong>Made with ❤️ by Sayantan Gope</strong></p>
-  <p><em>Check it Out!!. ⚡</em></p>
+  <p><em>Tinder for Developers. ⚡</em></p>
 </div>
