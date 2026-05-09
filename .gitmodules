@@ -1,0 +1,6 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/sayantangope/DevMatchs-server.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/sayantangope/DevMatchs-web.git
